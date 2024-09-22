@@ -1,20 +1,20 @@
 use {
     anchor_lang::prelude::*,
     crate::{state::*,utils::*},
-    anchor_spl::{token_interface},
+    anchor_spl::token_interface,
     std::mem::size_of
 };
 
 
-pub fn handler(ctx:Context<InitailizePool>)->Result<()>{
+pub fn handler(ctx:Context<InitializePool>)->Result<()>{
     check_token_program(ctx.accounts.token_program.key());
 
     // Initialize pool state 
     let pool_state = &mut ctx.accounts.pool_state;
-    pool_state.bump = ctx.bump.pool_state;
+    pool_state.bump = ctx.bumps.pool_state;
     pool_state.amount = 0;
     pool_state.vault_bump = ctx.bumps.token_vault;
-    pool_state.vault_auth_bump =ctx.bump.pool_authority;
+    pool_state.vault_auth_bump =ctx.bumps.pool_authority;
     pool_state.token_mint = ctx.accounts.token_mint.key();
     pool_state.staking_token_mint = ctx.accounts.staking_token_mint.key();
     pool_state.vault_authority = ctx.accounts.pool_authority.key();
