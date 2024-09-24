@@ -1,7 +1,7 @@
 use {
     anchor_lang::prelude::*,
     anchor_spl::{token::TokenAccount, token_interface},
-    std::mem::size_of
+    std::mem::size_of,
 };
 
 pub const STAKE_POOL_STATE_SEED: &str = "state";
@@ -28,5 +28,3 @@ pub struct StakeEntry {
     pub balance: u64,
     pub last_staked: i64,
 }
-
-
