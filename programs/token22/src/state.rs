@@ -1,7 +1,6 @@
 use {
     anchor_lang::prelude::*,
     anchor_spl::{token::TokenAccount, token_interface},
-    solana_program::pubkey::Pubkey,
     std::mem::size_of
 };
 
