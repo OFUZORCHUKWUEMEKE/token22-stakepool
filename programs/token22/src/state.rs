@@ -25,7 +25,7 @@ pub struct StakeEntry {
     pub user: Pubkey,
     pub user_stake_token_account: Pubkey,
     pub bump: u8,
-    pub balance: u8,
+    pub balance: u64,
     pub last_staked: i64,
 }
 
