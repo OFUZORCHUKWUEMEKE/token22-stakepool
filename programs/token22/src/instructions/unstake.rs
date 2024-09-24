@@ -20,13 +20,53 @@ pub fn handler(ctx:Context<Unstake>)->Result<()>{
     let auth_bump = ctx.accounts.pool_state.vault_auth_bump;
     let auth_seeds = &[VAULT_AUTH_SEED.as_bytes(), &[auth_bump]];
     let signer = &[&auth_seeds[..]];
-    transfer_checked(ctx.accounts.transfer_checked_ctx(signer), amount, decimals)?;
+
+      // transfer out_amount from stake vault to user
+    let transfer_ix = transfer_checked(
+        &ctx.accounts.token_program.key(),
+        &ctx.accounts.token_vault.key(),
+        &ctx.accounts.token_mint.key(),
+        &ctx.accounts.user_token_account.key(),
+        &ctx.accounts.pool_authority.key(),
+        &[&ctx.accounts.pool_authority.key()],
+        amount,
+        6
+    ).unwrap();
+    invoke_signed(
+        &transfer_ix,
+        &[
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_vault.to_account_info(),
+            ctx.accounts.token_mint.to_account_info(),
+            ctx.accounts.user_token_account.to_account_info(),
+            ctx.accounts.pool_authority.to_account_info(),
+        ],
+        signer
+    )?;
 
     // mint users staking rewards, 10x amount of staked tokens
     let stake_rewards = amount.checked_mul(10).unwrap();
  
     // mint rewards to user
-    mint_to(ctx.accounts.mint_to_ctx(signer), stake_rewards)?;
+    let mint_ix = mint_to(
+        &ctx.accounts.token_program.key(),
+        &ctx.accounts.staking_token_mint.key(),
+        &ctx.accounts.user_stake_token_account.key(),
+        &ctx.accounts.pool_authority.key(),
+        &[&ctx.accounts.pool_authority.key()],
+        stake_rewards
+    ).unwrap();
+    invoke_signed(
+        &mint_ix,
+        &[
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.staking_token_mint.to_account_info(),
+            ctx.accounts.user_stake_token_account.to_account_info(),
+            ctx.accounts.user.to_account_info(),
+            ctx.accounts.pool_authority.to_account_info(),
+        ],
+        signer
+    )?;
 
     // borrow mutable references
     let user_entry = &mut ctx.accounts.user_stake_entry;
